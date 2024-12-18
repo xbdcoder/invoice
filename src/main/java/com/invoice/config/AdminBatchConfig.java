@@ -5,6 +5,7 @@ import com.invoice.job.ApiItemReader;
 import com.invoice.job.Admin;
 import com.invoice.job.AdminItemProcessor;
 import com.invoice.job.AdminRepository;
+import com.invoice.util.WebClientUtil;
 import org.springframework.batch.core.*;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.job.builder.JobBuilder;
@@ -29,8 +30,8 @@ public class AdminBatchConfig {
 
     // Custom ItemReader to fetch data from the API
 //    @Bean(name = "adminReader")
-    public ApiItemReader reader(RestTemplate restTemplate, List<Integer> ids) {
-        return new ApiItemReader(restTemplate, ids);  // ApiItemReader should implement ItemReader<Admin>
+    public ApiItemReader reader(WebClientUtil restTemplate) {
+        return new ApiItemReader(restTemplate);  // ApiItemReader should implement ItemReader<Admin>
     }
 
     // ItemProcessor to process Admin objects if necessary
