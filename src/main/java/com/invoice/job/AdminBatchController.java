@@ -1,5 +1,8 @@
 package com.invoice.job;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.launch.JobLauncher;
@@ -10,7 +13,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.IntStream;
 
@@ -24,6 +30,19 @@ public class AdminBatchController {
     @Autowired
     private Job job; // AdminBatchConfig job
 
+    @Autowired
+    private WebClient.Builder webClientBuilder;
+
+    @Autowired
+    private ObjectMapper objectMapper;  // Ensure Jackson ObjectMapper is available
+
+    private final AdminService adminService;
+
+    // Constructor injection for AdminService
+    public AdminBatchController(AdminService adminService) {
+        this.adminService = adminService;
+    }
+
     // Configure ThreadPoolTaskExecutor inside the controller
     public ThreadPoolTaskExecutor threadPoolTaskExecutor() {
         String rand = String.valueOf(Math.random()).substring(2, 8);
@@ -36,10 +55,13 @@ public class AdminBatchController {
         return executor;
     }
 
+    @PostMapping("/fetch")
+    public void fetchAdmins(@RequestBody List<Integer> ids) {
+        adminService.fetchAndSaveUsers(ids);
+    }
     @PostMapping("/process")
     public String startBatchJob(@RequestBody List<Integer> ids) {
         try {
-
             // Iterating 100 times using IntStream
             IntStream.range(0, 2).forEach(i -> {
                 // Do something for each iteration

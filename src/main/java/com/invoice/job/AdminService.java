@@ -18,27 +18,34 @@ public class AdminService {
     @Autowired
     private AdminRepository userRepository;
 
-    @Retryable(maxAttempts = 5, value = Exception.class, backoff = @Backoff(delay = 5000, multiplier = 2))
+    @Retryable(maxAttempts = 2, value = Exception.class, backoff = @Backoff(delay = 50, multiplier = 2))
     public void fetchAndSaveUsers(List<Integer> ids) {
-        String apiUrl = "http://localhost:8989/api/user"; // Replace with actual API URL
 
-        // Fetch all users from the external API
-        List<Admin> users = restTemplate.getForObject(apiUrl, List.class);
+        // Define the URL for the API endpoint
+        String apiUrl = "http://localhost:8989/api/user";
 
-        if (users != null) {
-            // Filter the users based on the provided IDs
-            List<Admin> filteredUsers = users.stream()
-                    .filter(user -> ids.contains(Integer.parseInt(user.getId())))
-                    .collect(Collectors.toList());
+        // Create the RequestBody object with the list of IDs
+        RequestBodyAPI requestBody = new RequestBodyAPI(ids);
 
-            // Save filtered users to the database
-            filteredUsers.forEach(user -> {
-                Admin dbUser = new Admin();
-                dbUser.setId(user.getId());
-                dbUser.setFirstName(user.getFirstName());
-                dbUser.setLastName(user.getLastName());
-                userRepository.save(dbUser);
-            });
+        // Send the POST request with the request body and receive a List of Admin objects in response
+        List<Admin> admins = restTemplate.postForObject(apiUrl, requestBody, List.class);
+
+        System.out.println(admins);
+
+        if (admins != null) {
+//            // Filter the users based on the provided IDs
+//            List<Admin> filteredUsers = admins.stream()
+//                    .filter(user -> ids.contains(Integer.parseInt(user.getId())))
+//                    .toList();
+//
+//            // Save filtered users to the database
+//            filteredUsers.forEach(user -> {
+//                Admin dbUser = new Admin();
+//                dbUser.setId(user.getId());
+//                dbUser.setFirstName(user.getFirstName());
+//                dbUser.setLastName(user.getLastName());
+//                userRepository.save(dbUser);
+//            });
         } else {
             throw new RuntimeException("Failed to fetch users from the API");
         }

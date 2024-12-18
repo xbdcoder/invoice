@@ -1,18 +1,21 @@
 package com.invoice.job;
 
-import lombok.Getter;
-import lombok.Setter;
-
 import java.util.List;
 
-// POJO for the request body
-@Setter
-@Getter
 public class RequestBodyAPI {
     private List<Integer> ids;
 
+    // Constructor
     public RequestBodyAPI(List<Integer> ids) {
         this.ids = ids;
     }
 
+    // Getters and setters
+    public List<Integer> getIds() {
+        return ids;
+    }
+
+    public void setIds(List<Integer> ids) {
+        this.ids = ids;
+    }
 }
