@@ -1,30 +1,44 @@
 package com.invoice.auth;
 
-import jakarta.annotation.Nullable;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Null;
-import jakarta.validation.constraints.Size;
+import com.invoice.role.Role;
+import lombok.Data;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import jakarta.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
+
 @Entity
-@Getter
-@Setter
-@NoArgsConstructor
+@Table(name = "users")
+@Data
 public class User {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name;
-
+    @Column(name = "email", unique = true)
     private String email;
 
+    @Column(name = "username", unique = true)
+    private String username;
+
+    @Column(name = "name")
+    private String name;
+
+    @Column(name = "address")
     private String address;
+
+    @Column(name = "password")
+    private String password;
+
+    // Many-to-many relationship with Role
+    @ManyToMany
+    @JoinTable(
+            name = "user_role",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+    private Set<Role> roles = new HashSet<>();
 }

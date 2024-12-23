@@ -10,7 +10,6 @@ services:
       - '3306:3306'
     networks:
       - app-network
-
   phpmyadmin:
     image: phpmyadmin:latest
     restart: always
@@ -24,7 +23,24 @@ services:
       - mysql
     networks:
       - app-network
-
+  localstack:
+    image: localstack/localstack:latest
+    container_name: localstack
+    ports:
+      - "4566:4566" # Main LocalStack Gateway
+      - "4571:4571" # S3 Endpoint
+    environment:
+      - SERVICES=s3 # Specify services you want to use, e.g., s3, dynamodb, lambda, etc.
+      - DEBUG=1 # Enable debugging
+      - AWS_ACCESS_KEY_ID=test # Default Access Key for local AWS
+      - AWS_SECRET_ACCESS_KEY=test # Default Secret Key for local AWS
+      - DATA_DIR=/tmp/localstack/data # Persistent data directory
+    volumes:
+      - "./localstack:/tmp/localstack" # Bind a local directory for persistence
+#      - "./localstack-data:/tmp/localstack"
+      - "/var/run/docker.sock:/var/run/docker.sock" # Allow Docker Lambda executions
+    networks:
+      - app-network
 networks:
   app-network:
     driver: bridge

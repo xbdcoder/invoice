@@ -1,10 +1,6 @@
 package com.invoice.config;
 
-import com.invoice.job.AdminRepositoryItemWriter;
-import com.invoice.job.ApiItemReader;
-import com.invoice.job.Admin;
-import com.invoice.job.AdminItemProcessor;
-import com.invoice.job.AdminRepository;
+import com.invoice.job.*;
 import com.invoice.util.WebClientUtil;
 import org.springframework.batch.core.*;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
@@ -12,21 +8,19 @@ import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.item.ItemProcessor;
-import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.web.client.RestTemplate;
-
-import java.util.List;
 
 @Configuration
 @EnableBatchProcessing
 public class AdminBatchConfig {
+
+//    @Autowired
+//    private JobCompletionNotificationListener jobCompletionNotificationListener;
 
     // Custom ItemReader to fetch data from the API
 //    @Bean(name = "adminReader")
@@ -64,6 +58,7 @@ public class AdminBatchConfig {
     @Bean
     public Job adminJob(JobRepository jobRepository, Step adminStep) {
         return new JobBuilder("adminJob", jobRepository)
+//                .listener(jobCompletionNotificationListener)  // Add the listener to the job
                 .start(adminStep)
                 .build();
     }
